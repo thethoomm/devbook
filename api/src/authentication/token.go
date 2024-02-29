@@ -1,15 +1,16 @@
 package authentication
 
 import (
-	"api/src/config"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/thethoomm/ranga-app/api/internal/config"
 )
 
 func CreateToke(userID uint64) (string, error) {
@@ -20,7 +21,7 @@ func CreateToke(userID uint64) (string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, permissions)
 
-	return token.SignedString(config.SecretKey) // Colocar no .env
+	return token.SignedString(config.SecretKey)
 }
 
 func ValidateToken(r *http.Request) error {
@@ -41,6 +42,7 @@ func ValidateToken(r *http.Request) error {
 
 func ExtractUserID(r *http.Request) (uint64, error) {
 	tokenString := extractToken(r)
+	log.Println("TOKEN EXTRACT:", tokenString)
 
 	token, err := jwt.Parse(tokenString, returnVerifyKey)
 	if err != nil {
