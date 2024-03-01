@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/form"
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
+import { Toaster } from "@/components/ui/toaster"
+import { useToast } from "@/components/ui/use-toast"
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/Navbar"
 import { jwtDecode } from "jwt-decode"
@@ -24,12 +26,14 @@ import axios from "axios"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { baseUrl } from "@/env";
+import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
+import { PostsList } from "@/components/PostsList";
 
 const formSchema = z.object({
-  postTitle: z.string().max(50, {
+  postTitle: z.string().min(1).max(50, {
     message: "Post title must be up to 50 characters"
   }),
-  postContent: z.string().max(300, {
+  postContent: z.string().min(1).max(300, {
     message: "Post content must be at least 300 characters"
   }),
 })
@@ -38,8 +42,10 @@ export default function Home() {
 
   const router = useRouter()
   const { token } = useAuth()
+  const { toast } = useToast()
 
   const [user, setUser] = useState<UserType>()
+  const [showToast, setShowToast] = useState<boolean>(false)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -61,6 +67,10 @@ export default function Home() {
         content: values.postContent
       }
     }).then((response) => {
+      toast({
+        title: "Published post",
+        description: "Your post has just been published"
+      })
       console.log(response)
     })
   }
@@ -98,8 +108,12 @@ export default function Home() {
         user && (
           <div>
             <Navbar user={user} />
-            <main className="w-screen">
-              <aside className="w-5/12 p-6">
+            <main className="w-screen flex lg:flex-row flex-col">
+              <aside className="lg:w-5/12 w-full p-6">
+                <div className="lg:hidden md:hidden flex relative items-center w-full mb-10">
+                  <MagnifyingGlassIcon className="absolute left-2 size-6 text-muted-foreground" />
+                  <Input placeholder="Search user" className="pl-8" />
+                </div>
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                     <FormField
@@ -122,7 +136,7 @@ export default function Home() {
                         <FormItem>
                           <FormLabel>Content</FormLabel>
                           <FormControl>
-                            <Textarea className="resize-none" placeholder="Type your post content" {...field}/>
+                            <Textarea className="resize-none" placeholder="Type your post content" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -132,8 +146,11 @@ export default function Home() {
                   </form>
                 </Form>
               </aside>
-              <div></div>
+              <div className="lg:7/12">
+                <PostsList user={user}/>
+              </div>
             </main>
+            <Toaster />
           </div>
         )
       }

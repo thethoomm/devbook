@@ -25,7 +25,7 @@ export function Navbar({ user }: Props) {
       <div className="w-fit">
         <p className="font-mono font-bold">devbook.io</p>
       </div>
-      <div className="flex relative items-center w-6/12">
+      <div className="sm:flex hidden relative items-center w-6/12">
         <MagnifyingGlassIcon className="absolute left-2 size-6 text-muted-foreground" />
         <Input placeholder="Search user" className="pl-8 border-0 bg-zinc-800" />
       </div>
@@ -41,7 +41,7 @@ export function Navbar({ user }: Props) {
                   }
                 </AvatarFallback>
               </Avatar>
-              <h1>{ user.username }</h1>
+              <h1 className="md:block hidden">{ user.username }</h1>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
