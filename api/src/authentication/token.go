@@ -9,8 +9,9 @@ import (
 	"strings"
 	"time"
 
+	"api/src/config"
+
 	jwt "github.com/dgrijalva/jwt-go"
-	"github.com/thethoomm/ranga-app/api/internal/config"
 )
 
 func CreateToke(userID uint64) (string, error) {
