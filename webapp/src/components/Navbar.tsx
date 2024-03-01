@@ -12,11 +12,16 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { MagnifyingGlassIcon } from "@radix-ui/react-icons"
+import { UserType } from "@/types/user.type"
 
+interface Props {
+  user: UserType
+}
 
-export function Navbar() {
+export function Navbar({ user }: Props) {
+
   return (
-    <nav className="w-full bg-zinc-900 text-secondary items-center flex flex-row justify-between py-2 px-6">
+    <nav className="w-full bg-zinc-950 text-secondary items-center flex flex-row justify-between py-2 px-6">
       <div className="w-fit">
         <p className="font-mono font-bold">devbook.io</p>
       </div>
@@ -27,21 +32,27 @@ export function Navbar() {
       <div className="">
         <DropdownMenu>
           <DropdownMenuTrigger>
-            <div>
+            <Button variant={"ghost"} className="flex flex-row items-center space-x-2">
               <Avatar className="size-8">
-                <AvatarImage src="https://github.com/shadcn.png" />
-                <AvatarFallback>CN</AvatarFallback>
+                <AvatarImage src="https://github.com/thethoomm.png" />
+                <AvatarFallback>
+                  {
+                    user.username.slice(0,2)
+                  }
+                </AvatarFallback>
               </Avatar>
-              <h1>Text</h1>
-            </div>
+              <h1>{ user.username }</h1>
+            </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Billing</DropdownMenuItem>
-            <DropdownMenuItem>Team</DropdownMenuItem>
-            <DropdownMenuItem>Subscription</DropdownMenuItem>
+            <DropdownMenuItem>Preferences</DropdownMenuItem>
+            <DropdownMenuItem>Support</DropdownMenuItem>
+            <DropdownMenuItem>
+              <p className="text-red-400">Logout</p>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

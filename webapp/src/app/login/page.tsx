@@ -17,12 +17,13 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Separator } from "@/components/ui/separator"
-import { GitHubLogoIcon } from '@radix-ui/react-icons'
+import { ExclamationTriangleIcon, GitHubLogoIcon } from '@radix-ui/react-icons'
 import axios from 'axios'
 import Link from 'next/link'
-import { jwtDecode } from 'jwt-decode'
-import { JWT } from '@/interfaces/JWTDecode'
+import { useState } from 'react'
+import { baseUrl } from '@/env'
 
 const formSchema = z.object({
   email: z.string().email({
@@ -38,6 +39,8 @@ export default function Login() {
   const router = useRouter()
   const { setToken, token } = useAuth()
 
+  const [showAlert, setShowAlert] = useState<boolean>(false)
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -47,14 +50,15 @@ export default function Login() {
   })
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    axios.post("http://localhost:5000/login", {
+    axios.post(`${baseUrl}/login`, {
       email: values.email,
       password: values.password
     }).then((response) => {
       setToken(String(response.data))
-      console.log(jwtDecode(String(response.data)))
-      // router.push("/")
+      localStorage.setItem('token', response.data)
+      router.push("/")
     }).catch(function (error) {
+      setShowAlert(true)
       console.log(error);
     })
   }
@@ -101,6 +105,18 @@ export default function Login() {
                   Sign up
                 </Link>
               </p>
+              {
+                showAlert && (
+                  <Alert variant={'destructive'}>
+                    <ExclamationTriangleIcon className="size-6" />
+                    <AlertTitle className='ml-2'>Error</AlertTitle>
+                    <AlertDescription className='ml-2'>
+                      An internal server error has occurred
+                    </AlertDescription>
+                  </Alert>
+
+                )
+              }
               <Button className='w-full'>Login</Button>
               <Separator />
               <div className='flex-1'>

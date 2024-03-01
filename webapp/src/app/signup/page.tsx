@@ -21,6 +21,7 @@ import { Separator } from "@/components/ui/separator"
 import { GitHubLogoIcon } from '@radix-ui/react-icons'
 import axios from 'axios'
 import Link from 'next/link'
+import { baseUrl } from '@/env'
 
 const formSchema = z.object({
   name: z.string().min(1, {
@@ -53,7 +54,7 @@ export default function Signup() {
   })
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    axios.post("http://localhost:5000/users", {
+    axios.post(`${baseUrl}/users`, {
       name: values.name,
       username: values.username,
       email: values.email,

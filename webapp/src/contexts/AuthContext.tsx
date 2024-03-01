@@ -1,9 +1,10 @@
 "use client"
 import { ReactNode, createContext, useContext, useState } from "react"
+import { jwtDecode } from 'jwt-decode'
 
 interface AuthContextType {
   token: string | null | undefined;
-  setToken: React.Dispatch<React.SetStateAction<string | null | undefined>>
+  setToken: React.Dispatch<React.SetStateAction<string | null >>
 }
 
 interface Props {
@@ -13,7 +14,8 @@ interface Props {
 export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: Props) {
-  const [token, setToken] = useState<string | null >()
+  const localToken = localStorage.getItem("token")
+  const [token, setToken] = useState<string | null >(localToken)
 
   return (
     <AuthContext.Provider value={{ token, setToken }}>
