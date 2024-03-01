@@ -10,6 +10,7 @@ type Posts struct {
 }
 
 func (p Posts) Create(post models.Post) (uint64, error) {
+	defer p.db.Close()
 	stmt, err := p.db.Prepare("INSERT INTO posts(title, content, authorId) VALUES (?, ?, ?)")
 	if err != nil {
 		return 0, err
@@ -30,6 +31,7 @@ func (p Posts) Create(post models.Post) (uint64, error) {
 }
 
 func (p Posts) FindById(postID uint64) (*models.Post, error) {
+	defer p.db.Close()
 	rows, err := p.db.Query("SELECT p.*, u.username FROM posts p INNER JOIN users u ON u.id = p.authorId WHERE p.id = ?", postID)
 	if err != nil {
 		return &models.Post{}, err
@@ -55,6 +57,7 @@ func (p Posts) FindById(postID uint64) (*models.Post, error) {
 }
 
 func (p Posts) Find(userID uint64) (*[]models.Post, error) {
+	defer p.db.Close()
 	rows, err := p.db.Query(`
 	SELECT DISTINCT p.*, u.username 
 	FROM posts P
@@ -90,6 +93,7 @@ func (p Posts) Find(userID uint64) (*[]models.Post, error) {
 }
 
 func (p Posts) Update(postID uint64, post models.Post) error {
+	defer p.db.Close()
 	stmt, err := p.db.Prepare("UPDATE posts SET title = ?, content = ? WHERE id = ?")
 	if err != nil {
 		return err
@@ -104,6 +108,7 @@ func (p Posts) Update(postID uint64, post models.Post) error {
 }
 
 func (p Posts) Delete(postID uint64) error {
+	defer p.db.Close()
 	stmt, err := p.db.Prepare("DELETE FROM posts WHERE id = ?")
 	if err != nil {
 		return err
@@ -118,6 +123,7 @@ func (p Posts) Delete(postID uint64) error {
 }
 
 func (p Posts) FindPostByUser(userID uint64) (*[]models.Post, error) {
+	defer p.db.Close()
 	rows, err := p.db.Query(`
 	SELECT p.*, u.username 
 	FROM posts p JOIN users u ON u.id = p.authorId 
@@ -149,6 +155,7 @@ func (p Posts) FindPostByUser(userID uint64) (*[]models.Post, error) {
 }
 
 func (p Posts) LikePost(postID uint64) error {
+	defer p.db.Close()
 	stmt, err := p.db.Prepare("UPDATE posts SET likes = likes + 1 WHERE id = ?")
 	if err != nil {
 		return err
@@ -163,6 +170,7 @@ func (p Posts) LikePost(postID uint64) error {
 }
 
 func (p Posts) DislikePost(postID uint64) error {
+	defer p.db.Close()
 	stmt, err := p.db.Prepare(`
 		UPDATE posts SET likes = 
 		CASE 

@@ -11,7 +11,7 @@ type Users struct {
 }
 
 func (u Users) Create(user models.User) (uint64, error) {
-
+	defer u.db.Close()
 	stmt, err := u.db.Prepare("INSERT INTO users (name, username, email, password) VALUES (?, ?, ?, ?)")
 	if err != nil {
 		return 0, err
@@ -32,6 +32,7 @@ func (u Users) Create(user models.User) (uint64, error) {
 }
 
 func (u Users) Find(nameOrUsername string) (*[]models.User, error) {
+	defer u.db.Close()
 	nameOrUsername = fmt.Sprintf("%%%s%%", nameOrUsername)
 
 	rows, err := u.db.Query(
@@ -58,6 +59,7 @@ func (u Users) Find(nameOrUsername string) (*[]models.User, error) {
 }
 
 func (u Users) FindById(id uint64) (*models.User, error) {
+	defer u.db.Close()
 	rows, err := u.db.Query("SELECT id, name, username, email, createdAt FROM users WHERE id = ?", id)
 	if err != nil {
 		return &models.User{}, err
@@ -75,6 +77,7 @@ func (u Users) FindById(id uint64) (*models.User, error) {
 }
 
 func (u Users) FindByEmail(email string) (*models.User, error) {
+	defer u.db.Close()
 	rows, err := u.db.Query("SELECT id, password FROM users WHERE email = ?", email)
 	if err != nil {
 		return &models.User{}, err
@@ -92,6 +95,7 @@ func (u Users) FindByEmail(email string) (*models.User, error) {
 }
 
 func (u Users) Update(id uint64, user models.User) error {
+	defer u.db.Close()
 	stmt, err := u.db.Prepare("UPDATE users SET name = ?, username = ?, email = ? WHERE id = ?")
 	if err != nil {
 		return err
@@ -107,6 +111,7 @@ func (u Users) Update(id uint64, user models.User) error {
 }
 
 func (u Users) Delete(id uint64) error {
+	defer u.db.Close()
 	stmt, err := u.db.Prepare("DELETE FROM users WHERE id = ?")
 	if err != nil {
 		return err
@@ -122,6 +127,7 @@ func (u Users) Delete(id uint64) error {
 }
 
 func (u Users) Follow(userID, followerID uint64) error {
+	defer u.db.Close()
 	stmt, err := u.db.Prepare("INSERT IGNORE INTO followers (userID, followerID) VALUES (?, ?)")
 	if err != nil {
 		return err
@@ -136,6 +142,7 @@ func (u Users) Follow(userID, followerID uint64) error {
 }
 
 func (u Users) Unfollow(userID, followerID uint64) error {
+	defer u.db.Close()
 	stmt, err := u.db.Prepare("DELETE FROM followers WHERE userID = ? AND followerID = ?")
 	if err != nil {
 		return err
@@ -150,6 +157,7 @@ func (u Users) Unfollow(userID, followerID uint64) error {
 }
 
 func (u Users) FindFollowers(userID uint64) (*[]models.User, error) {
+	defer u.db.Close()
 	rows, err := u.db.Query("SELECT u.id, u.name, u.username, u.email, u.createdAt FROM users u INNER JOIN followers f ON u.id = f.followerID WHERE f.userID = ?", userID)
 	if err != nil {
 		return nil, err
@@ -170,6 +178,7 @@ func (u Users) FindFollowers(userID uint64) (*[]models.User, error) {
 }
 
 func (u Users) FindFollowing(userID uint64) (*[]models.User, error) {
+	defer u.db.Close()
 	rows, err := u.db.Query("SELECT u.id, u.name, u.username, u.email, u.createdAt FROM users u INNER JOIN followers f ON u.id = f.userID WHERE f.followerID = ?", userID)
 	if err != nil {
 		return nil, err
@@ -190,6 +199,7 @@ func (u Users) FindFollowing(userID uint64) (*[]models.User, error) {
 }
 
 func (u Users) FindPassword(userID uint64) (string, error) {
+	defer u.db.Close()
 	rows, err := u.db.Query("SELECT password FROM users WHERE id = ?", userID)
 	if err != nil {
 		return "", err
@@ -208,6 +218,7 @@ func (u Users) FindPassword(userID uint64) (string, error) {
 }
 
 func (u Users) UpdatePassword(userID uint64, passwordHashed string) error {
+	defer u.db.Close()
 	stmt, err := u.db.Prepare("UPDATE users SET password = ? WHERE id = ?")
 	if err != nil {
 		return err
