@@ -15,8 +15,10 @@ func main() {
 	r := router.CreateRouter()
 
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"*"},
+		AllowedOrigins:   []string{"*", "http://localhost:3000", "http://localhost:3001"},
 		AllowCredentials: true,
+		AllowedHeaders:   []string{"Content-Type", "Authorization"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},
 	})
 
 	handler := c.Handler(r)
